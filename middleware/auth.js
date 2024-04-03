@@ -20,10 +20,9 @@ const authenticate = async (req, res, next) => {
             })
         }
         user.password = undefined
-        user.accessToken = token
-
+        
         req.loggedInUserData = {};
-        req.loggedInUserData['user'] = user;
+        req.loggedInUserData['user'] = { user, accessToken: token };
         next();
     } catch (error) {
         return res.status(401).json({
