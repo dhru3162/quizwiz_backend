@@ -42,9 +42,9 @@ module.exports = {
                 email: user.email,
             }
             const jwtToken = jsonwebtoken.sign(tokenObj, process.env.JWT_SECRET_KEY, { expiresIn: '1h' })
-            user.accessToken = jwtToken
+            // user.accessToken = jwtToken
             return res.status(200).json({
-                data: user,
+                data: { user, accessToken: jwtToken },
             })
 
         } catch (error) {
