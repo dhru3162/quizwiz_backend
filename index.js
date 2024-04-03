@@ -10,8 +10,9 @@ require('./database/db');
 
 const PORT = process.env.PORT || 8000;
 
+app.use(express.static('public'));
 app.use(express.json())
-app.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 app.use('/auth', userRoutes);
 app.use('/quiz', quizRoutes);
 
