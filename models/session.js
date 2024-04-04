@@ -10,6 +10,10 @@ const SessionSchema = mongoose.Schema(
             type: String,
             required: true,
         },
+        status: {
+            type: String,
+            default: 'current',
+        },
         loginAt: {
             type: Date,
             default: null,

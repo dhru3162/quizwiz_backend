@@ -39,6 +39,7 @@ module.exports = {
             const session = await Session.create({
                 userId: user._id,
                 token: jwtToken,
+                status: 'current',
                 loginAt: DateTime.utc(),
                 expireAt: DateTime.utc().plus({ hours: 1 })
             })
@@ -64,7 +65,7 @@ module.exports = {
 
         try {
             // Find user is exist or not
-            const user = await User.findOne({ email: email })
+            const user = await User.findOne({ email: email }).lean()
             if (!user) {
                 return res.status(404).json({
                     massage: 'User not found. Please try again with different email.'
@@ -93,6 +94,7 @@ module.exports = {
                 {
                     userId: user._id,
                     token: jwtToken,
+                    status: 'current',
                     loginAt: DateTime.utc(),
                     expireAt: DateTime.utc().plus({ hours: 1 }),
                 }
@@ -125,23 +127,20 @@ module.exports = {
     logOutUser: async (req, res) => {
         const { sessionId } = req.body;
 
-        if (sessionId) {
+        if (!sessionId) {
             return res.status(400).json({
                 massage: 'sessionId Required'
             })
         }
 
         try {
-            const session = await Session.findByIdAndDelete(sessionId)
-            if (!session) {
-                return res.status(400).json({
-                    massage: "Session Already Expired.",
-                })
-            } else {
-                return res.status(200).json({
-                    massage: "Logout Successful.",
-                })
-            }
+            await Session.findByIdAndUpdate(
+                sessionId,
+                { status: 'expired', }
+            )
+            return res.status(200).json({
+                massage: "Logout Successful.",
+            })
 
         } catch (error) {
             return res.status(500).json({

@@ -26,7 +26,7 @@ const authenticate = async (req, res, next) => {
         const session = await Session.findOne({
             userId: user._id
         });
-        if (!session) {
+        if (!session || session.status === 'expired') {
             return res.status(401).json({
                 massage: 'jwt expired'
             })

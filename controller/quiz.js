@@ -38,12 +38,11 @@ module.exports = {
     },
 
     addQuiz: async (req, res) => {
-        const quiz = new Quiz(req.body);
         try {
-            const response = await quiz.save();
+            const quiz = await Quiz.create(req.body);
             return res.status(201).json({
                 massage: 'New Quiz Added Successfully',
-                data: response,
+                data: quiz,
             })
         } catch (error) {
             return res.status(500).json({
@@ -56,7 +55,7 @@ module.exports = {
     updateQuiz: async (req, res) => {
         const id = req.params.id
         const data = req.body
-        console.log(data)
+
         try {
             const quiz = await Quiz.findByIdAndUpdate(id, data);
             if (!quiz) {
