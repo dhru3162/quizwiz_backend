@@ -8,7 +8,8 @@
   "host": "localhost:8000",
   "basePath": "/",
   "schemes": [
-    "http://localhost:8000"
+    "http://localhost:8000",
+    "https://quizwiz-backend.vercel.app/"
   ],
   "tags": [
     {
@@ -24,7 +25,7 @@
         "tags": [
           "Quiz"
         ],
-        "description": "Get quiz data",
+        "description": "",
         "parameters": [
           {
             "name": "authorization",
@@ -50,7 +51,7 @@
         "tags": [
           "Quiz"
         ],
-        "description": "Get one user data",
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -61,8 +62,7 @@
           {
             "name": "authorization",
             "in": "header",
-            "type": "string",
-            "required": true
+            "type": "string"
           }
         ],
         "responses": {
@@ -84,7 +84,7 @@
         "tags": [
           "Quiz"
         ],
-        "description": "Edit Quiz",
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -95,27 +95,7 @@
           {
             "name": "authorization",
             "in": "header",
-            "type": "string",
-            "required": true
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "example": "string"
-                },
-                "description": {
-                  "example": "string"
-                },
-                "totalQuestions": {
-                  "example": "number"
-                }
-              }
-            }
+            "type": "string"
           }
         ],
         "responses": {
@@ -137,7 +117,7 @@
         "tags": [
           "Quiz"
         ],
-        "description": "Delete Quiz",
+        "description": "",
         "parameters": [
           {
             "name": "id",
@@ -148,8 +128,7 @@
           {
             "name": "authorization",
             "in": "header",
-            "type": "string",
-            "required": true
+            "type": "string"
           }
         ],
         "responses": {
@@ -170,32 +149,12 @@
         "tags": [
           "Quiz"
         ],
-        "description": "Add Quiz",
+        "description": "",
         "parameters": [
           {
             "name": "authorization",
             "in": "header",
-            "type": "string",
-            "required": true
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "example": "string"
-                },
-                "description": {
-                  "example": "string"
-                },
-                "totalQuestions": {
-                  "example": "number"
-                }
-              }
-            }
+            "type": "string"
           }
         ],
         "responses": {
@@ -216,7 +175,7 @@
         "tags": [
           "Auth"
         ],
-        "description": "Register User",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -225,13 +184,13 @@
               "type": "object",
               "properties": {
                 "fullName": {
-                  "example": "string"
+                  "example": "any"
                 },
                 "email": {
-                  "example": "string"
+                  "example": "any"
                 },
                 "password": {
-                  "example": "string"
+                  "example": "any"
                 }
               }
             }
@@ -255,7 +214,7 @@
         "tags": [
           "Auth"
         ],
-        "description": "Login User",
+        "description": "",
         "parameters": [
           {
             "name": "body",
@@ -264,10 +223,10 @@
               "type": "object",
               "properties": {
                 "email": {
-                  "example": "string"
+                  "example": "any"
                 },
                 "password": {
-                  "example": "string"
+                  "example": "any"
                 }
               }
             }
@@ -280,6 +239,9 @@
           "400": {
             "description": "Bad Request"
           },
+          "401": {
+            "description": "Unauthorized"
+          },
           "404": {
             "description": "Not Found"
           },
@@ -290,11 +252,11 @@
       }
     },
     "/auth/whoAmI": {
-      "post": {
+      "get": {
         "tags": [
           "Auth"
         ],
-        "description": "Check Token Valid Or Not",
+        "description": "",
         "parameters": [
           {
             "name": "authorization",
@@ -308,6 +270,47 @@
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "sessionId": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
