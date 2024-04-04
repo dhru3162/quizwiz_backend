@@ -85,7 +85,6 @@ module.exports = {
             if (!quiz) {
                 return res.status(500).json({
                     massage: "Quiz Not Found",
-                    err,
                 })
             } else {
                 return res.status(200).json({
