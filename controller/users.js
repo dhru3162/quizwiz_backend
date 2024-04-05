@@ -15,6 +15,7 @@ module.exports = {
             const user = await User.create({
                 fullName,
                 email,
+                role: 'user'
             });
 
             // Encrypt Password And Store In DataBase
@@ -36,7 +37,7 @@ module.exports = {
                 process.env.JWT_SECRET_KEY,
                 { expiresIn: expireTime }
             )
-            const session = await Session.create({
+            await Session.create({
                 userId: user._id,
                 token: jwtToken,
                 status: 'current',
@@ -45,11 +46,8 @@ module.exports = {
             })
 
             return res.status(201).json({
-                massage: 'User Registered Successfully',
-                data: {
-                    user,
-                    session
-                },
+                user,
+                token: jwtToken
             })
         } catch (error) {
             return res.status(500).json({
@@ -89,7 +87,7 @@ module.exports = {
             }
             const expireTime = 3 * 60 * 60;
             const jwtToken = jsonwebtoken.sign(tokenObj, process.env.JWT_SECRET_KEY, { expiresIn: expireTime })
-            const session = await Session.findOneAndUpdate(
+            await Session.findOneAndUpdate(
                 { userId: user._id, },
                 {
                     userId: user._id,
@@ -97,15 +95,12 @@ module.exports = {
                     status: 'current',
                     loginAt: DateTime.utc(),
                     expireAt: DateTime.utc().plus({ hours: 1 }),
-                }
+                },
             )
 
             return res.status(200).json({
-                massage: 'Login successful.',
-                data: {
-                    user,
-                    session: await Session.findById(session._id)
-                },
+                user,
+                token: jwtToken
             })
 
         } catch (error) {

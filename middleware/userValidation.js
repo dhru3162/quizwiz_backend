@@ -1,14 +1,14 @@
-const Joi = require("joi")
+const User = require("../models/user");
 
 const emailPattern = /^[a-z0-9._-]+@[a-z0-9-]+\.[a-z]{2,4}$/i;
 const passwordPattern = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
 
-const userRegisterValidation = (req, res, next) => {
+const userRegisterValidation = async (req, res, next) => {
     const { fullName, email, password } = req.body
 
     if (!fullName || !email || !password) {
         return res.status(400).json({
-            massage: 'Provide All Feilds',
+            massage: 'Provide All Required Feilds',
             ["exp."]: {
                 fullName: "string",
                 email: "string",
@@ -20,6 +20,14 @@ const userRegisterValidation = (req, res, next) => {
     if (typeof fullName !== 'string') {
         return res.status(400).json({
             massage: 'Full name must be a string and at least 5 characters',
+        })
+    }
+
+    const registerdUsers = await User.findOne({ email: email })
+
+    if (registerdUsers) {
+        return res.status(400).json({
+            massage: 'This email already registerd',
         })
     }
 
@@ -43,7 +51,7 @@ const userLoginValidation = (req, res, next) => {
 
     if (!email || !password) {
         return res.status(400).json({
-            massage: 'Provide All Feilds',
+            massage: 'Provide All Required Feilds',
             ["exp."]: {
                 email: "string",
                 password: "string"
