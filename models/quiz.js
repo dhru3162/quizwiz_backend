@@ -28,18 +28,17 @@ const QuizSchema = new mongoose.Schema(
                     type: String,
                     required: true
                 }],
-                correctAnswers: [
-                    {
-                        type: String,
-                        required: true
-                    }
-                ]
+                correctAnswers: {
+                    type: String,
+                    required: true
+                },
             }
         ],
     },
     {
         timestamps: true,
-    })
+    }
+)
 
 const Quiz = mongoose.model('quizzes', QuizSchema);
 

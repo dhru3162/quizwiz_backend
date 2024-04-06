@@ -4,7 +4,6 @@ const { userRegisterValidation, userLoginValidation } = require('../middleware/u
 const { authenticate } = require('../middleware/auth');
 const routes = express.Router();
 
-
 routes.post('/register', userRegisterValidation, registerUser)
 routes.post('/login', userLoginValidation, loginUser)
 routes.get('/whoAmI', authenticate, checkWhoIs)
