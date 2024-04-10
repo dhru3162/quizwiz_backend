@@ -1,24 +1,45 @@
-// const bodyParser = require('body-parser');
 const express = require('express');
-const auth = require('./routes/auth');
-const quiz = require('./routes/quiz');
-const user = require('./routes/user');
 const swaggerUi = require('swagger-ui-express');
 const swaggerDoc = require("./swagger_output.json");
-var cors = require('cors')
-const app = express();
+var cors = require('cors');
+const { userRegisterValidation, userLoginValidation } = require('./middleware/userValidation');
+const { registerUser, loginUser, checkWhoIs, logOutUser } = require('./controller/users');
+const { authenticate } = require('./middleware/auth');
+const { getQuiz, getOneQuiz, addQuiz, updateQuiz, deleteQuiz, addQuestion, editQuestion, deleteQuestion } = require('./controller/quiz');
+const { validateRole } = require('./middleware/validateRole');
+const { addHistory, getHistory, getScore } = require('./controller/history');
 require('dotenv').config();
 require('./database/db');
 
+const app = express();
 const PORT = process.env.PORT || 8000;
 
 app.use(express.static('public'));
 app.use(cors())
 app.use(express.json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
-app.use('/auth', auth);
-app.use('/quiz', quiz);
-app.use('/user', user)
+
+// auth routes
+app.post('/auth/register', userRegisterValidation, registerUser)
+app.post('/auth/login', userLoginValidation, loginUser)
+app.get('/auth/whoAmI', authenticate, checkWhoIs)
+app.post('/auth/logout', authenticate, logOutUser)
+
+// quiz routes
+app.get('/quiz/', authenticate, getQuiz)
+app.get('/quiz/:id', authenticate, getOneQuiz)
+app.post('/quiz/add', authenticate, validateRole, addQuiz)
+app.put('/quiz/:id', authenticate, validateRole, updateQuiz)
+app.delete('/quiz/:id', authenticate, validateRole, deleteQuiz)
+app.post('/quiz/addquestion/:id', authenticate, validateRole, addQuestion)
+app.put('/quiz/editquestion/:id', authenticate, validateRole, editQuestion)
+app.delete('/quiz/:quizId/deletequestion/:questionId', authenticate, validateRole, deleteQuestion)
+
+// users routes
+app.post('/user/addhistory', authenticate, addHistory)
+app.get('/user/history', authenticate, getHistory)
+app.get('/user/getscore', authenticate, getScore)
+
 
 app.listen(PORT, () => {
     console.log(`Server is runing on port: ${PORT}`);

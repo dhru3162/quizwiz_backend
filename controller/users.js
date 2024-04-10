@@ -42,7 +42,7 @@ module.exports = {
                 token: jwtToken,
                 status: 'current',
                 loginAt: DateTime.utc(),
-                expireAt: DateTime.utc().plus({ hours: 1 })
+                expireAt: DateTime.utc().plus({ hours: 3 })
             })
 
             return res.status(201).json({
@@ -94,7 +94,7 @@ module.exports = {
                     token: jwtToken,
                     status: 'current',
                     loginAt: DateTime.utc(),
-                    expireAt: DateTime.utc().plus({ hours: 1 }),
+                    expireAt: DateTime.utc().plus({ hours: 3 }),
                 },
             )
 
