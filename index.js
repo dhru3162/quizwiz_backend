@@ -3,11 +3,11 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDoc = require("./swagger_output.json");
 var cors = require('cors');
 const { userRegisterValidation, userLoginValidation } = require('./middleware/userValidation');
-const { registerUser, loginUser, checkWhoIs, logOutUser } = require('./controller/users');
+const { registerUser, loginUser, checkWhoIs, logOutUser } = require('./controller/auth');
 const { authenticate } = require('./middleware/auth');
 const { getQuiz, getOneQuiz, addQuiz, updateQuiz, deleteQuiz, addQuestion, editQuestion, deleteQuestion } = require('./controller/quiz');
 const { validateRole } = require('./middleware/validateRole');
-const { addHistory, getHistory, getScore } = require('./controller/history');
+const { addHistory, getHistory, getScore, getUsersData } = require('./controller/users');
 require('dotenv').config();
 require('./database/db');
 
@@ -36,6 +36,7 @@ app.put('/quiz/editquestion/:id', authenticate, validateRole, editQuestion)
 app.delete('/quiz/:quizId/deletequestion/:questionId', authenticate, validateRole, deleteQuestion)
 
 // users routes
+app.get('/user', authenticate, validateRole, getUsersData)
 app.post('/user/addhistory', authenticate, addHistory)
 app.get('/user/history', authenticate, getHistory)
 app.get('/user/getscore', authenticate, getScore)

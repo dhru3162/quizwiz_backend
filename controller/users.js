@@ -1,106 +1,49 @@
-const jsonwebtoken = require("jsonwebtoken");
+const History = require("../models/history")
 const User = require("../models/user")
-const bcrypt = require("bcrypt");
-const Credential = require("../models/credential");
-const Session = require("../models/session");
-const { DateTime } = require("luxon");
-
 
 module.exports = {
-    registerUser: async (req, res) => {
-        const { fullName, email, password } = req.body;
+    addHistory: async (req, res) => {
+        const { quizData, score, result, percentage } = req.body
+        const { loggedInUserData: { user } } = req
 
         try {
-            // Create User In DataBase
-            const user = await User.create({
-                fullName,
-                email,
-                role: 'user'
-            });
+            const history = await History.findOne({ userId: user._id })
 
-            // Encrypt Password And Store In DataBase
-            const encryptedPassword = await bcrypt.hash(password, 10);
-            await Credential.create({
-                userId: user._id,
-                password: encryptedPassword,
-            })
-
-            // Generate Jwt Token And Store In DataBase
-            const tokenObj = {
-                _id: user._id,
-                fullName: user.fullName,
-                email: user.email,
+            if (history) {
+                await History.findByIdAndUpdate(
+                    { _id: history._id },
+                    {
+                        $inc: { totalScore: score },
+                        $push: {
+                            history: {
+                                quizData,
+                                score,
+                                result,
+                                percentage
+                            }
+                        }
+                    },
+                    { new: true }
+                )
+            } else {
+                await History.create({
+                    userId: user._id,
+                    fullName: user.fullName,
+                    email: user.email,
+                    totalScore: score,
+                    history: [
+                        {
+                            quizData,
+                            score,
+                            result,
+                            percentage
+                        }
+                    ]
+                })
             }
-            const expireTime = 3 * 60 * 60;
-            const jwtToken = jsonwebtoken.sign(
-                tokenObj,
-                process.env.JWT_SECRET_KEY,
-                { expiresIn: expireTime }
-            )
-            await Session.create({
-                userId: user._id,
-                token: jwtToken,
-                status: 'current',
-                loginAt: DateTime.utc(),
-                expireAt: DateTime.utc().plus({ hours: 3 })
-            })
 
             return res.status(201).json({
-                user,
-                token: jwtToken
-            })
-        } catch (error) {
-            return res.status(500).json({
-                massage: "User Not Register",
-                error: error,
-            })
-        }
-
-    },
-
-    loginUser: async (req, res) => {
-        const { email, password } = req.body
-
-        try {
-            // Find user is exist or not
-            const user = await User.findOne({ email: email }).lean()
-            if (!user) {
-                return res.status(404).json({
-                    massage: 'User not found. Please try again with different email.'
-                })
-            }
-
-            // Get password and check is correct or not
-            const credential = await Credential.findOne({ userId: user._id })
-            const checkPassword = await bcrypt.compare(password, credential.password)
-            if (!checkPassword) {
-                return res.status(401).json({
-                    massage: 'Invalid Password.'
-                })
-            }
-
-            // Generate Jwt Token And Update In Session DataBase
-            const tokenObj = {
-                _id: user._id,
-                fullName: user.fullName,
-                email: user.email,
-            }
-            const expireTime = 3 * 60 * 60;
-            const jwtToken = jsonwebtoken.sign(tokenObj, process.env.JWT_SECRET_KEY, { expiresIn: expireTime })
-            await Session.findOneAndUpdate(
-                { userId: user._id, },
-                {
-                    userId: user._id,
-                    token: jwtToken,
-                    status: 'current',
-                    loginAt: DateTime.utc(),
-                    expireAt: DateTime.utc().plus({ hours: 3 }),
-                },
-            )
-
-            return res.status(200).json({
-                user,
-                token: jwtToken
+                massage: 'User History Added'
             })
 
         } catch (error) {
@@ -110,38 +53,67 @@ module.exports = {
             })
         }
     },
-
-    checkWhoIs: (req, res) => {
-        const { loggedInUserData } = req;
-        res.status(200).json({
-            user: loggedInUserData["user"],
-            session: loggedInUserData["session"]
-        });
-    },
-
-    logOutUser: async (req, res) => {
-        const { sessionId } = req.body;
-
-        if (!sessionId) {
-            return res.status(400).json({
-                massage: 'sessionId Required'
-            })
-        }
+    getHistory: async (req, res) => {
+        const { loggedInUserData: { user } } = req
 
         try {
-            await Session.findByIdAndUpdate(
-                sessionId,
-                { status: 'expired', }
-            )
+            const history = await History.findOne({ userId: user._id })
+
+            if (!history) {
+                return res.status(404).json({
+                    massage: 'Users History Not Found',
+                })
+            }
+
             return res.status(200).json({
-                massage: "Logout Successful.",
+                data: history.history
+            })
+
+
+        } catch (error) {
+            return res.status(500).json({
+                massage: "error",
+                error,
+            })
+        }
+    },
+    getScore: async (req, res) => {
+        const { loggedInUserData: { user } } = req
+
+        try {
+            const history = await History.findOne({ userId: user._id })
+
+            if (!history) {
+                return res.status(404).json({
+                    massage: 'Users Score Not Found',
+                })
+            }
+
+            return res.status(200).json({
+                totalScore: history.totalScore
             })
 
         } catch (error) {
             return res.status(500).json({
                 massage: "error",
-                error
+                error,
             })
         }
     },
+    getUsersData: async (req, res) => {
+        try {
+            const allUsersList = await User.find().lean()
+            const removedAdmin = allUsersList.filter((user) => user.role != 'admin')
+
+            return res.status(200).json({
+                data: removedAdmin
+            })
+
+        } catch (error) {
+            return res.status(500).json({
+                massage: "error",
+                error,
+            })
+        }
+    }
 }
