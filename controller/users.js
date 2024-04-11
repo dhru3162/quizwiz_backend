@@ -102,11 +102,11 @@ module.exports = {
     },
     getUsersData: async (req, res) => {
         try {
-            const allUsersList = await User.find().lean()
-            const removedAdmin = allUsersList.filter((user) => user.role != 'admin')
+            const allUsersList = await User.find({ role: "user" }).lean()
+            // const removedAdmin = allUsersList.filter((user) => user.role != 'admin')
 
             return res.status(200).json({
-                data: removedAdmin
+                data: allUsersList
             })
 
         } catch (error) {
