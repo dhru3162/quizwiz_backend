@@ -26,7 +26,7 @@ app.get('/auth/whoAmI', authenticate, checkWhoIs)
 app.post('/auth/logout', authenticate, logOutUser)
 
 // quiz routes
-app.get('/quiz/', authenticate, getQuiz)
+app.get('/quiz', authenticate, getQuiz)
 app.get('/quiz/:id', authenticate, getOneQuiz)
 app.post('/quiz/add', authenticate, validateRole, addQuiz)
 app.put('/quiz/:id', authenticate, validateRole, updateQuiz)
@@ -40,7 +40,6 @@ app.get('/user', authenticate, validateRole, getUsersData)
 app.post('/user/addhistory', authenticate, addHistory)
 app.get('/user/history', authenticate, getHistory)
 app.get('/user/getscore', authenticate, getScore)
-
 
 app.listen(PORT, () => {
     console.log(`Server is runing on port: ${PORT}`);

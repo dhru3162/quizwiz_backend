@@ -11,6 +11,6 @@ const doc = {
 };
 
 const outputFile = "./swagger_output.json";
-const routes = ['./routes/*.js'];
+const routes = ['./index.js'];
 
 swaggerAutogen(outputFile, routes, doc);
