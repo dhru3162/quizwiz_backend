@@ -100,13 +100,41 @@ module.exports = {
             })
         }
     },
+
     getUsersData: async (req, res) => {
+        const { search, sort } = req.query
+        const queryObj = { role: "user" }
+
+        if (search) {
+            queryObj.fullName = { $regex: search, $options: "i" }
+        }
+
+        const getList = User.find(queryObj)
+
+        if (sort && sort != 'totalScore' && sort != '-totalScore') {
+            getList.sort(sort)
+        }
+
         try {
-            const allUsersList = await User.find({ role: "user" }).lean()
-            // const removedAdmin = allUsersList.filter((user) => user.role != 'admin')
+            const usersList = await getList.lean()
+            const getScore = await History.find().lean()
+
+            const userData = usersList.map((user) => {
+                const filterUser = getScore.filter((score) => user._id == score.userId)
+                const totalScore = filterUser.length !== 0 ? filterUser[0].totalScore : 0
+                return { ...user, totalScore: totalScore }
+            })
+
+            if (sort == 'totalScore') {
+                userData.sort((a, b) => a.totalScore - b.totalScore)
+            }
+
+            if (sort == '-totalScore') {
+                userData.sort((a, b) => b.totalScore - a.totalScore);
+            }
 
             return res.status(200).json({
-                data: allUsersList
+                data: userData
             })
 
         } catch (error) {

@@ -28,7 +28,7 @@ const authenticate = async (req, res, next) => {
         });
         if (!session || session.status === 'expired') {
             return res.status(401).json({
-                massage: 'jwt expired'
+                massage: 'jwt token expired'
             })
         }
 
@@ -38,7 +38,7 @@ const authenticate = async (req, res, next) => {
         next();
     } catch (error) {
         return res.status(401).json({
-            massage: 'Unauthorized User',
+            massage: 'jwt token expired',
             error
         })
     }
