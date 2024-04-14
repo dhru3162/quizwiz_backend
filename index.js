@@ -8,6 +8,7 @@ const { authenticate } = require('./middleware/auth');
 const { getQuiz, getOneQuiz, addQuiz, updateQuiz, deleteQuiz, addQuestion, editQuestion, deleteQuestion } = require('./controller/quiz');
 const { validateRole } = require('./middleware/validateRole');
 const { addHistory, getHistory, getScore, getUsersData } = require('./controller/users');
+const { contactUs } = require('./controller/contact');
 require('dotenv').config();
 require('./database/db');
 
@@ -40,6 +41,9 @@ app.get('/user', authenticate, validateRole, getUsersData)
 app.post('/user/addhistory', authenticate, addHistory)
 app.get('/user/history', authenticate, getHistory)
 app.get('/user/getscore', authenticate, getScore)
+
+// contact routes
+app.post("/contact", contactUs);
 
 app.listen(PORT, () => {
     console.log(`Server is runing on port: ${PORT}`);
