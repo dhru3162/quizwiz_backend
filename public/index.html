@@ -45,8 +45,12 @@
             background-color: #0056b3;
         }
 
+        .git-div {
+            display: flex;
+            justify-content: center;
+        }
+
         .github-icon {
-            display: inline-block;
             text-decoration: none;
             color: #333;
             margin-top: 20px;
@@ -68,6 +72,15 @@
             color: #666;
             margin-bottom: 5px;
         }
+
+        .author-info a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .author-info a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -75,13 +88,14 @@
     <div class="container">
         <h1>QuizWiz Backend</h1>
         <p>Welcome to the QuizWiz Backend API!</p>
-        <button type="button" onclick="redirectToPage()">API Documentation</button><br/>
-        <a href="https://github.com/dhru3162" target="_blank" class="github-icon">
-            <i class="fab fa-github"></i>
-        </a>
+        <button type="button" onclick="redirectToPage()">API Documentation</button><br />
+        <div class="git-div">
+            <a href="https://github.com/dhru3162" target="_blank" class="github-icon">
+                <i class="fab fa-github"></i>
+            </a>
+        </div>
         <div class="author-info">
-            <p>Created by John Doe</p>
-            <p>Contact: dhru33170@gmail.com</p>
+            <p>Contact: <a href="mailto:dhru33170@gmail.com">dhru33170@gmail.com</a></p>
         </div>
     </div>
 
@@ -90,6 +104,10 @@
             const destinationUrl = "/api-docs"
             window.location.href = destinationUrl;
         }
+        document.getElementById('emailLink').addEventListener('click', function () {
+            var emailAddress = 'johndoe@example.com';
+            window.location.href = 'mailto:' + emailAddress;
+        });
     </script>
 </body>
 
