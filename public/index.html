@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <title>QuizWiz Backend</title>
     <style>
         body {
@@ -43,6 +44,30 @@
         button:hover {
             background-color: #0056b3;
         }
+
+        .github-icon {
+            display: inline-block;
+            text-decoration: none;
+            color: #333;
+            margin-top: 20px;
+            font-size: 24px;
+            transition: transform 0.3s ease;
+        }
+
+        .github-icon:hover {
+            transform: scale(1.2);
+        }
+
+        .author-info {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .author-info p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 
@@ -51,11 +76,18 @@
         <h1>QuizWiz Backend</h1>
         <p>Welcome to the QuizWiz Backend API!</p>
         <button type="button" onclick="redirectToPage()">API Documentation</button>
+        <a href="https://github.com/dhru3162" target="_blank" class="github-icon">
+            <i class="fab fa-github"></i>
+        </a>
+        <div class="author-info">
+            <p>Created by John Doe</p>
+            <p>Contact: dhru33170@gmail.com</p>
+        </div>
     </div>
 
     <script>
         function redirectToPage() {
-            const destinationUrl = "/api-docs"; // Replace with your desired URL
+            const destinationUrl = "/api-docs"
             window.location.href = destinationUrl;
         }
     </script>
