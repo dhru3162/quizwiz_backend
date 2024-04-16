@@ -1,19 +1,42 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "QuizWiz Backend",
-    "description": "Quiz based tasks management API",
+    "title": "QuizWiz App Backend",
     "version": "1.0.0"
   },
-  "host": "localhost:8000",
-  "basePath": "/",
-  "schemes": [
-    "http://localhost:8000",
-    "https://quizwiz-backend.vercel.app"
+  "securityDefinitions": {
+    "JWTToken": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "JWT token (e.g., 'Bearer <token>')"
+    }
+  },
+  "security": [
+    {
+      "JWTToken": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication"
+    },
+    {
+      "name": "Quiz"
+    },
+    {
+      "name": "User"
+    },
+    {
+      "name": "Contact"
+    }
   ],
   "paths": {
     "/auth/register": {
       "post": {
+        "tags": [
+          "Authentication"
+        ],
         "description": "",
         "parameters": [
           {
@@ -50,6 +73,9 @@
     },
     "/auth/login": {
       "post": {
+        "tags": [
+          "Authentication"
+        ],
         "description": "",
         "parameters": [
           {
@@ -89,6 +115,9 @@
     },
     "/auth/whoAmI": {
       "get": {
+        "tags": [
+          "Authentication"
+        ],
         "description": "",
         "parameters": [
           {
@@ -109,6 +138,9 @@
     },
     "/auth/logout": {
       "post": {
+        "tags": [
+          "Authentication"
+        ],
         "description": "",
         "parameters": [
           {
@@ -139,6 +171,9 @@
           "401": {
             "description": "Unauthorized"
           },
+          "404": {
+            "description": "Not Found"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -147,6 +182,9 @@
     },
     "/quiz": {
       "get": {
+        "tags": [
+          "Quiz"
+        ],
         "description": "",
         "parameters": [
           {
@@ -170,6 +208,9 @@
     },
     "/quiz/{id}": {
       "get": {
+        "tags": [
+          "Quiz"
+        ],
         "description": "",
         "parameters": [
           {
@@ -200,6 +241,9 @@
         }
       },
       "put": {
+        "tags": [
+          "Quiz"
+        ],
         "description": "",
         "parameters": [
           {
@@ -233,6 +277,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "Quiz"
+        ],
         "description": "",
         "parameters": [
           {
@@ -268,6 +315,9 @@
     },
     "/quiz/add": {
       "post": {
+        "tags": [
+          "Quiz"
+        ],
         "description": "",
         "parameters": [
           {
@@ -321,6 +371,9 @@
     },
     "/quiz/addquestion/{id}": {
       "post": {
+        "tags": [
+          "Quiz"
+        ],
         "description": "",
         "parameters": [
           {
@@ -359,6 +412,9 @@
     },
     "/quiz/editquestion/{id}": {
       "put": {
+        "tags": [
+          "Quiz"
+        ],
         "description": "",
         "parameters": [
           {
@@ -409,6 +465,9 @@
     },
     "/quiz/{quizId}/deletequestion/{questionId}": {
       "delete": {
+        "tags": [
+          "Quiz"
+        ],
         "description": "",
         "parameters": [
           {
@@ -453,11 +512,24 @@
     },
     "/user": {
       "get": {
+        "tags": [
+          "User"
+        ],
         "description": "",
         "parameters": [
           {
             "name": "authorization",
             "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "sort",
+            "in": "query",
             "type": "string"
           }
         ],
@@ -479,6 +551,9 @@
     },
     "/user/addhistory": {
       "post": {
+        "tags": [
+          "User"
+        ],
         "description": "",
         "parameters": [
           {
@@ -523,6 +598,9 @@
     },
     "/user/history": {
       "get": {
+        "tags": [
+          "User"
+        ],
         "description": "",
         "parameters": [
           {
@@ -549,6 +627,9 @@
     },
     "/user/getscore": {
       "get": {
+        "tags": [
+          "User"
+        ],
         "description": "",
         "parameters": [
           {
@@ -566,6 +647,45 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/contact": {
+      "post": {
+        "tags": [
+          "Contact"
+        ],
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "any"
+                },
+                "email": {
+                  "example": "any"
+                },
+                "massage": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "500": {
             "description": "Internal Server Error"
