@@ -151,7 +151,8 @@ module.exports = {
 
             return res.status(200).json({
                 massage: "Logout Successful.",
-            })
+            }).redirect("https://quizwiz-app.vercel.app")
+            // res.redirect("http://localhost:3001")
 
         } catch (error) {
             return res.status(500).json({
