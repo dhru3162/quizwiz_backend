@@ -143,9 +143,9 @@ module.exports = {
                 })
             }
 
-            await Session.findOneAndUpdate(
+            await Session.findByIdAndUpdate(
                 sessionId,
-                { status: 'expired', },
+                { status: 'expired' },
                 { new: true }
             )
 
