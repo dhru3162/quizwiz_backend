@@ -129,17 +129,33 @@ module.exports = {
         }
 
         try {
-            await Session.findByIdAndUpdate(
+            const getSession = await Session.findById(sessionId)
+
+            if (!getSession) {
+                return res.status(404).json({
+                    massage: 'sessionId not found'
+                })
+            }
+
+            if (getSession.status == 'expired') {
+                return res.status(200).json({
+                    massage: 'Token Already Expired'
+                })
+            }
+
+            await Session.findOneAndUpdate(
                 sessionId,
-                { status: 'expired', }
+                { status: 'expired', },
+                { new: true }
             )
+
             return res.status(200).json({
                 massage: "Logout Successful.",
             })
 
         } catch (error) {
             return res.status(500).json({
-                massage: "error",
+                massage: "Internal Server Error",
                 error
             })
         }

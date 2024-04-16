@@ -15,7 +15,7 @@ const authenticate = async (req, res, next) => {
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
         // Get User Data
-        const user = await User.findById(decodedToken._id);
+        const user = await User.findOne({ email: decodedToken.email });
         if (!user) {
             return res.status(401).json({
                 massage: 'User Not Found'
@@ -26,7 +26,7 @@ const authenticate = async (req, res, next) => {
         const session = await Session.findOne({
             userId: user._id
         });
-        if (!session || session.status === 'expired') {
+        if (!session || session.status === 'expired' || session.token != token) {
             return res.status(401).json({
                 massage: 'jwt token expired'
             })
