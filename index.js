@@ -1,7 +1,7 @@
 const express = require('express');
+const cors = require('cors')
 const swaggerUi = require('swagger-ui-express');
 const swaggerDoc = require("./swagger_output.json");
-var cors = require('cors');
 const { userRegisterValidation, userLoginValidation } = require('./middleware/userValidation');
 const { registerUser, loginUser, checkWhoIs, logOutUser } = require('./controller/auth');
 const { authenticate } = require('./middleware/auth');
@@ -9,7 +9,6 @@ const { getQuiz, getOneQuiz, addQuiz, updateQuiz, deleteQuiz, addQuestion, editQ
 const { validateRole } = require('./middleware/validateRole');
 const { addHistory, getHistory, getScore, getUsersData } = require('./controller/users');
 const { contactUs } = require('./controller/contact');
-require("./passport");
 require('dotenv').config();
 require('./database/db');
 
@@ -17,9 +16,9 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 
 app.use(express.static('public'));
+app.use(cors())
 app.use(express.json());
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
-app.use(cors())
 
 // auth routes
 app.post('/auth/register', userRegisterValidation, registerUser)
