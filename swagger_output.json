@@ -2,10 +2,14 @@
   "swagger": "2.0",
   "info": {
     "title": "QuizWiz App Backend",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "contact": {
+      "name": "Dhru",
+      "email": "dhru33170@gmail.com"
+    }
   },
   "securityDefinitions": {
-    "JWTToken": {
+    "JWT": {
       "type": "apiKey",
       "name": "Authorization",
       "in": "header",
@@ -14,7 +18,7 @@
   },
   "security": [
     {
-      "JWTToken": []
+      "JWT": []
     }
   ],
   "tags": [
@@ -81,6 +85,7 @@
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
               "type": "object",
               "properties": {
