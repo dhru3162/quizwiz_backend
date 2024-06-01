@@ -3,8 +3,8 @@ const cors = require('cors')
 const swaggerUi = require('swagger-ui-express');
 const swaggerDoc = require("./swagger_output.json");
 const { userRegisterValidation, userLoginValidation } = require('./middleware/userValidation');
-const { registerUser, loginUser, checkWhoIs, logOutUser } = require('./controller/auth');
-const { authenticate } = require('./middleware/auth');
+const { registerUser, loginUser, checkWhoIs, logOutUser, changePassword } = require('./controller/auth');
+const { authenticate, changePasswordValidate } = require('./middleware/auth');
 const { getQuiz, getOneQuiz, addQuiz, updateQuiz, deleteQuiz, addQuestion, editQuestion, deleteQuestion } = require('./controller/quiz');
 const { validateRole } = require('./middleware/validateRole');
 const { addHistory, getHistory, getScore, getUsersData } = require('./controller/users');
@@ -25,6 +25,7 @@ app.post('/auth/register', userRegisterValidation, registerUser)
 app.post('/auth/login', userLoginValidation, loginUser)
 app.get('/auth/whoAmI', authenticate, checkWhoIs)
 app.post('/auth/logout', authenticate, logOutUser)
+app.post('/auth/changePassword', authenticate, changePasswordValidate, changePassword)
 
 // quiz routes
 app.get('/quiz', authenticate, getQuiz)

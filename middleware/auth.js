@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Session = require("../models/session");
+const { PASSWORD_PATTERN } = require("../util/constant");
 
 const authenticate = async (req, res, next) => {
 
@@ -44,6 +45,50 @@ const authenticate = async (req, res, next) => {
     }
 };
 
+const changePasswordValidate = (req, res, next) => {
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+
+    try {
+        if (!currentPassword || !newPassword || !confirmNewPassword) {
+            return res.status(400).json({
+                massage: 'Provide All Required Feilds',
+                ["exp."]: {
+                    currentPassword: "string",
+                    newPassword: "string",
+                    confirmNewPassword: "string"
+                }
+            });
+        };
+
+        if (newPassword !== confirmNewPassword) {
+            return res.status(400).json({
+                massage: 'new password and confirmation password do not match.',
+            });
+        };
+
+        if (currentPassword === newPassword) {
+            return res.status(400).json({
+                massage: 'new password must be different from the current password.',
+            });
+        };
+
+        if (typeof newPassword !== 'string' || newPassword.length < 8 || !PASSWORD_PATTERN.test(newPassword)) {
+            return res.status(400).json({
+                massage: 'New password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character',
+            });
+        };
+
+        next();
+    } catch (error) {
+        return res.status(500).json({
+            massage: "error",
+            error,
+        });
+    };
+
+};
+
 module.exports = {
     authenticate,
+    changePasswordValidate,
 };
