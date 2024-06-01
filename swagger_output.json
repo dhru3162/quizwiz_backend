@@ -185,7 +185,7 @@
         }
       }
     },
-    "/auth/changePassword": {
+    "/auth/changepassword": {
       "post": {
         "tags": [
           "Authentication"

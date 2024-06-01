@@ -25,7 +25,7 @@ app.post('/auth/register', userRegisterValidation, registerUser)
 app.post('/auth/login', userLoginValidation, loginUser)
 app.get('/auth/whoAmI', authenticate, checkWhoIs)
 app.post('/auth/logout', authenticate, logOutUser)
-app.post('/auth/changePassword', authenticate, changePasswordValidate, changePassword)
+app.post('/auth/changepassword', authenticate, changePasswordValidate, changePassword)
 
 // quiz routes
 app.get('/quiz', authenticate, getQuiz)
