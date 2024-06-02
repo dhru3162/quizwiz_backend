@@ -9,12 +9,16 @@ const CredentialSchema = new mongoose.Schema(
         password: {
             type: String,
             required: true
-        }
+        },
+        forgotPasswordKey: {
+            type: Boolean,
+            default: false,
+        },
     },
     {
         timestamps: true,
-    }
-)
+    },
+);
 
 const Credential = mongoose.model('credential', CredentialSchema);
 

@@ -3,8 +3,8 @@ const cors = require('cors')
 const swaggerUi = require('swagger-ui-express');
 const swaggerDoc = require("./swagger_output.json");
 const { userRegisterValidation, userLoginValidation } = require('./middleware/userValidation');
-const { registerUser, loginUser, checkWhoIs, logOutUser, changePassword } = require('./controller/auth');
-const { authenticate, changePasswordValidate } = require('./middleware/auth');
+const { registerUser, loginUser, checkWhoIs, logOutUser, changePassword, forgotPassword, checkLink, ResetPassword } = require('./controller/auth');
+const { authenticate, changePasswordValidate, forgotPasswordValidation, ResetPasswordValidate } = require('./middleware/auth');
 const { getQuiz, getOneQuiz, addQuiz, updateQuiz, deleteQuiz, addQuestion, editQuestion, deleteQuestion } = require('./controller/quiz');
 const { validateRole } = require('./middleware/validateRole');
 const { addHistory, getHistory, getScore, getUsersData } = require('./controller/users');
@@ -23,6 +23,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 // auth routes
 app.post('/auth/register', userRegisterValidation, registerUser)
 app.post('/auth/login', userLoginValidation, loginUser)
+app.post('/auth/forgot-password', forgotPasswordValidation, forgotPassword)
+app.post('/auth/check-link', checkLink)
+app.post('/auth/reset-password', ResetPasswordValidate, ResetPassword)
 app.get('/auth/whoAmI', authenticate, checkWhoIs)
 app.post('/auth/logout', authenticate, logOutUser)
 app.post('/auth/changepassword', authenticate, changePasswordValidate, changePassword)

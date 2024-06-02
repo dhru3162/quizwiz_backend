@@ -1,7 +1,7 @@
 const nodemailer = require("nodemailer");
 
 const contactUs = async (req, res) => {
-    const { name, email, massage } = req.body
+    const { name, email, massage } = req.body;
 
     if (!name || !email || !massage) {
         return res.status(400).json({
@@ -11,8 +11,8 @@ const contactUs = async (req, res) => {
                 email: "string",
                 massage: "string",
             }
-        })
-    }
+        });
+    };
 
     try {
         const transporter = nodemailer.createTransport({
@@ -53,14 +53,14 @@ const contactUs = async (req, res) => {
 
         return res.status(200).json({
             massage: 'Information Sent Successfully'
-        })
+        });
 
     } catch (error) {
         return res.status(500).json({
             massage: "Internal server error",
             error,
-        })
-    }
+        });
+    };
 };
 
 module.exports = {
