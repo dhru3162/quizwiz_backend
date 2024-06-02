@@ -218,7 +218,6 @@ module.exports = {
             };
             const expireTime = 1 * 60 * 60;
             const jwtToken = jwt.sign(tokenObj, process.env.JWT_SECRET_KEY, { expiresIn: expireTime });
-            console.log('jwtToken: ', jwtToken);
 
             await Credential.findOneAndUpdate(
                 {
@@ -260,7 +259,7 @@ module.exports = {
                         </div>
                         <div class="footer" style="text-align: center; font-size: 12px; color: #777777; padding-top: 20px; border-top: 1px solid #e0e0e0;">
                             <p style="margin: 0;">If you did not request this password reset, please ignore this email or <a href="https://quizwiz-by-dhru3162.vercel.app/contact_us" style="color: #0C356A; text-decoration: none;">contact support</a>.</p>
-                            <p style="margin: 0;">© 2024 Company Name. All rights reserved.</p>
+                            <p style="margin: 0;">© 2024 Quizwiz. All rights reserved.</p>
                         </div>
                     </div>
                 </div>
