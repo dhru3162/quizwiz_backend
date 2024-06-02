@@ -1,4 +1,4 @@
-const jsonwebtoken = require("jsonwebtoken");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user")
 const bcrypt = require("bcrypt");
 const Credential = require("../models/credential");
@@ -32,7 +32,7 @@ module.exports = {
                 email: user.email,
             };
             const expireTime = 15 * 24 * 60 * 60;
-            const jwtToken = jsonwebtoken.sign(
+            const jwtToken = jwt.sign(
                 tokenObj,
                 process.env.JWT_SECRET_KEY,
                 { expiresIn: expireTime }
@@ -85,7 +85,7 @@ module.exports = {
                 email: user.email,
             };
             const expireTime = 15 * 24 * 60 * 60;
-            const jwtToken = jsonwebtoken.sign(tokenObj, process.env.JWT_SECRET_KEY, { expiresIn: expireTime })
+            const jwtToken = jwt.sign(tokenObj, process.env.JWT_SECRET_KEY, { expiresIn: expireTime })
             await Session.findOneAndUpdate(
                 { userId: user._id, },
                 {
@@ -217,7 +217,8 @@ module.exports = {
                 email: user.email,
             };
             const expireTime = 1 * 60 * 60;
-            const jwtToken = jsonwebtoken.sign(tokenObj, process.env.JWT_SECRET_KEY, { expiresIn: expireTime });
+            const jwtToken = jwt.sign(tokenObj, process.env.JWT_SECRET_KEY, { expiresIn: expireTime });
+            console.log('jwtToken: ', jwtToken);
 
             await Credential.findOneAndUpdate(
                 {
@@ -281,14 +282,14 @@ module.exports = {
     checkLink: async (req, res) => {
         const { token } = req.body;
 
-        if (!req.body) {
+        if (!token || token === "") {
             return res.status(400).json({
                 massage: 'Bad Request'
             })
         }
 
         try {
-            const decodedToken = jsonwebtoken.verify(token, process.env.JWT_SECRET_KEY);
+            const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
             const password = await Credential.findOne({ userId: decodedToken._id }).lean();
             if (!password?.forgotPasswordKey) {
@@ -313,7 +314,7 @@ module.exports = {
         console.log('newPaassword: ', newPassword);
 
         try {
-            const decodedToken = jsonwebtoken.verify(token, process.env.JWT_SECRET_KEY);
+            const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
             const encryptedPassword = await bcrypt.hash(newPassword, 10);
             await Credential.findOneAndUpdate(
