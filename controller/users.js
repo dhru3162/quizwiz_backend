@@ -43,12 +43,12 @@ module.exports = {
             }
 
             return res.status(201).json({
-                massage: 'User History Added'
+                message: 'User History Added'
             })
 
         } catch (error) {
             return res.status(500).json({
-                massage: "error",
+                message: "error",
                 error,
             })
         }
@@ -61,7 +61,7 @@ module.exports = {
 
             if (!history) {
                 return res.status(404).json({
-                    massage: 'Users History Not Found',
+                    message: 'Users History Not Found',
                 })
             }
 
@@ -72,7 +72,7 @@ module.exports = {
 
         } catch (error) {
             return res.status(500).json({
-                massage: "error",
+                message: "error",
                 error,
             })
         }
@@ -85,7 +85,7 @@ module.exports = {
 
             if (!history) {
                 return res.status(404).json({
-                    massage: 'Users Score Not Found',
+                    message: 'Users Score Not Found',
                 })
             }
 
@@ -95,7 +95,7 @@ module.exports = {
 
         } catch (error) {
             return res.status(500).json({
-                massage: "error",
+                message: "error",
                 error,
             })
         }
@@ -139,7 +139,7 @@ module.exports = {
 
         } catch (error) {
             return res.status(500).json({
-                massage: "error",
+                message: "error",
                 error,
             })
         }

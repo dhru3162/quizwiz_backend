@@ -842,7 +842,7 @@
                 "email": {
                   "example": "any"
                 },
-                "massage": {
+                "message": {
                   "example": "any"
                 }
               }

@@ -10,7 +10,7 @@ module.exports = {
 
         } catch (error) {
             return res.status(500).json({
-                massage: "error",
+                message: "error",
                 error,
             })
         }
@@ -22,7 +22,7 @@ module.exports = {
             const quiz = await Quiz.findById(id);
             if (!quiz) {
                 return res.status(404).json({
-                    massage: 'Quiz Not Found'
+                    message: 'Quiz Not Found'
                 })
             } else {
                 return res.status(200).json({
@@ -31,7 +31,7 @@ module.exports = {
             }
         } catch (error) {
             return res.status(500).json({
-                massage: "error",
+                message: "error",
                 error,
             })
         }
@@ -42,7 +42,7 @@ module.exports = {
 
         if (!title || !description || !totalQuestions || !time || !questions) {
             return res.status(400).json({
-                massage: 'Provide All Required Feilds',
+                message: 'Provide All Required Feilds',
                 ["exp."]: {
                     title: "string",
                     description: "string",
@@ -56,12 +56,12 @@ module.exports = {
         try {
             const quiz = await Quiz.create(req.body);
             return res.status(201).json({
-                massage: 'New Quiz Added Successfully',
+                message: 'New Quiz Added Successfully',
                 data: quiz,
             })
         } catch (error) {
             return res.status(500).json({
-                massage: "error",
+                message: "error",
                 error,
             })
         }
@@ -75,18 +75,18 @@ module.exports = {
             const quiz = await Quiz.findByIdAndUpdate(id, data, { new: true });
             if (!quiz) {
                 return res.status(404).json({
-                    massage: 'Quiz Not Found'
+                    message: 'Quiz Not Found'
                 })
             } else {
                 return res.status(200).json({
-                    massage: "Quiz Updated Successfully.",
+                    message: "Quiz Updated Successfully.",
                     data: quiz,
                 })
             }
 
         } catch (error) {
             return res.status(500).json({
-                massage: "error",
+                message: "error",
                 error,
             })
         }
@@ -98,17 +98,17 @@ module.exports = {
             const quiz = await Quiz.findByIdAndDelete(id);
             if (!quiz) {
                 return res.status(404).json({
-                    massage: "Quiz Not Found",
+                    message: "Quiz Not Found",
                 })
             } else {
                 return res.status(200).json({
-                    massage: "Quiz Deleted Successfully.",
+                    message: "Quiz Deleted Successfully.",
                 })
             }
 
         } catch (error) {
             return res.status(500).json({
-                massage: "error",
+                message: "error",
                 error,
             })
         }
@@ -120,7 +120,7 @@ module.exports = {
 
         if (!id) {
             return res.status(400).json({
-                massage: "Quiz Id Required In Params",
+                message: "Quiz Id Required In Params",
             })
         }
 
@@ -136,18 +136,18 @@ module.exports = {
 
             if (!updatedQuiz) {
                 return res.status(404).json({
-                    massage: 'Quiz Not Found'
+                    message: 'Quiz Not Found'
                 })
             }
 
             return res.status(201).json({
-                massage: 'New Question Added Successful.',
+                message: 'New Question Added Successful.',
                 data: updatedQuiz,
             })
 
         } catch (error) {
             return res.status(500).json({
-                massage: "error",
+                message: "error",
                 error,
             })
         }
@@ -159,13 +159,13 @@ module.exports = {
 
         if (!id) {
             return res.status(400).json({
-                massage: "Quiz Id Required In Params",
+                message: "Quiz Id Required In Params",
             })
         }
 
         if (!userRes._id) {
             return res.status(400).json({
-                massage: "Question Id Required In Body",
+                message: "Question Id Required In Body",
             })
         }
 
@@ -174,7 +174,7 @@ module.exports = {
 
             if (!quizData) {
                 return res.status(404).json({
-                    massage: 'Quiz Not Found'
+                    message: 'Quiz Not Found'
                 })
             }
 
@@ -189,12 +189,12 @@ module.exports = {
             await Quiz.findByIdAndUpdate(id, { questions: updatedQuiz }, { new: true })
 
             return res.status(200).json({
-                massage: "Question Edited Successfully.",
+                message: "Question Edited Successfully.",
             })
 
         } catch (error) {
             return res.status(500).json({
-                massage: "error",
+                message: "error",
                 error,
             })
         }
@@ -205,7 +205,7 @@ module.exports = {
 
         if (!quizId || !questionId) {
             return res.status(400).json({
-                massage: `${!quizId ? "quizId" : "questionId"} required in params`,
+                message: `${!quizId ? "quizId" : "questionId"} required in params`,
             })
         }
 
@@ -221,17 +221,17 @@ module.exports = {
 
             if (!deletedQuestion) {
                 return res.status(404).json({
-                    massage: 'Quiz Not Found'
+                    message: 'Quiz Not Found'
                 })
             }
 
             return res.status(200).json({
-                massage: "Question Deleted Successful.",
+                message: "Question Deleted Successful.",
             })
 
         } catch (error) {
             return res.status(500).json({
-                massage: "error",
+                message: "error",
                 error,
             })
         }

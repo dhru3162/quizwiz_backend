@@ -51,7 +51,7 @@ module.exports = {
             });
         } catch (error) {
             return res.status(500).json({
-                massage: "Internal Server Error",
+                message: "Internal Server Error",
                 error: error,
             });
         };
@@ -65,7 +65,7 @@ module.exports = {
             const user = await User.findOne({ email: email }).lean()
             if (!user) {
                 return res.status(404).json({
-                    massage: 'User not found. Please try again with different email.'
+                    message: 'User not found. Please try again with different email.'
                 });
             };
 
@@ -74,7 +74,7 @@ module.exports = {
             const checkPassword = await bcrypt.compare(password, credential.password)
             if (!checkPassword) {
                 return res.status(401).json({
-                    massage: 'Invalid Password.'
+                    message: 'Invalid Password.'
                 });
             };
 
@@ -104,7 +104,7 @@ module.exports = {
 
         } catch (error) {
             return res.status(500).json({
-                massage: "Internal Server Error",
+                message: "Internal Server Error",
                 error,
             });
         };
@@ -123,7 +123,7 @@ module.exports = {
 
         if (!sessionId) {
             return res.status(400).json({
-                massage: 'sessionId Required'
+                message: 'sessionId Required'
             });
         };
 
@@ -132,13 +132,13 @@ module.exports = {
 
             if (!getSession) {
                 return res.status(404).json({
-                    massage: 'sessionId not found'
+                    message: 'sessionId not found'
                 });
             };
 
             if (getSession.status == 'expired') {
                 return res.status(200).json({
-                    massage: 'Token Already Expired'
+                    message: 'Token Already Expired'
                 });
             };
 
@@ -149,12 +149,12 @@ module.exports = {
             )
 
             return res.status(200).json({
-                massage: "Logout Successful.",
+                message: "Logout Successful.",
             });
 
         } catch (error) {
             return res.status(500).json({
-                massage: "Internal Server Error",
+                message: "Internal Server Error",
                 error
             });
         };
@@ -169,7 +169,7 @@ module.exports = {
             const checkPassword = await bcrypt.compare(currentPassword, password);
             if (!checkPassword) {
                 return res.status(400).json({
-                    massage: 'Current password you entered is incorrect.'
+                    message: 'Current password you entered is incorrect.'
                 });
             };
 
@@ -183,17 +183,17 @@ module.exports = {
             );
             if (!upadetPassword) {
                 return res.status(404).json({
-                    massage: 'User Not Found'
+                    message: 'User Not Found'
                 });
             };
 
             return res.status(200).json({
-                massage: "Password changed successful.",
+                message: "Password changed successful.",
             });
 
         } catch (error) {
             return res.status(500).json({
-                massage: "Internal Server Error",
+                message: "Internal Server Error",
                 error
             });
         };
@@ -207,7 +207,7 @@ module.exports = {
             const user = await User.findOne({ email });
             if (!user) {
                 return res.status(404).json({
-                    massage: 'Email id not registered.'
+                    message: 'Email id not registered.'
                 });
             };
 
@@ -218,6 +218,7 @@ module.exports = {
             };
             const expireTime = 1 * 60 * 60;
             const jwtToken = jwt.sign(tokenObj, process.env.JWT_SECRET_KEY, { expiresIn: expireTime });
+            console.log('jwtToken: ', jwtToken);
 
             await Credential.findOneAndUpdate(
                 {
@@ -295,7 +296,7 @@ module.exports = {
 
         } catch (error) {
             return res.status(500).json({
-                massage: "Internal Server Error",
+                message: "Internal Server Error",
                 error
             });
         }
@@ -306,7 +307,7 @@ module.exports = {
 
         if (!token || token === "") {
             return res.status(400).json({
-                massage: 'Bad Request'
+                message: 'Bad Request'
             })
         }
 
@@ -316,7 +317,7 @@ module.exports = {
             const password = await Credential.findOne({ userId: decodedToken._id }).lean();
             if (!password?.forgotPasswordKey) {
                 return res.status(401).json({
-                    massage: 'token expired'
+                    message: 'token expired'
                 });
             };
 
@@ -326,19 +327,25 @@ module.exports = {
 
         } catch (error) {
             return res.status(401).json({
-                massage: 'token expired'
+                message: 'token expired'
             });
         };
     },
 
     ResetPassword: async (req, res) => {
         const { token, newPassword } = req.body;
-        console.log('newPaassword: ', newPassword);
 
         try {
             const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
             const encryptedPassword = await bcrypt.hash(newPassword, 10);
+            const credential = await Credential.findOne({ userId: decodedToken._id }).lean();
+            const checkPassword = await bcrypt.compare(newPassword, credential.password);
+            if (checkPassword) {
+                return res.status(401).json({
+                    message: 'Password must be different from the current one'
+                });
+            }
             await Credential.findOneAndUpdate(
                 {
                     userId: decodedToken._id,
@@ -350,12 +357,12 @@ module.exports = {
             );
 
             return res.status(200).json({
-                massage: "Password changed successful.",
+                message: "Password changed successful.",
             });
 
         } catch (error) {
             return res.status(401).json({
-                massage: 'token expired'
+                message: 'token expired'
             });
         }
     }

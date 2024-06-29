@@ -1,15 +1,15 @@
 const nodemailer = require("nodemailer");
 
 const contactUs = async (req, res) => {
-    const { name, email, massage } = req.body;
+    const { name, email, message } = req.body;
 
-    if (!name || !email || !massage) {
+    if (!name || !email || !message) {
         return res.status(400).json({
-            massage: 'Provide All Required Feilds',
+            message: 'Provide All Required Feilds',
             ["exp."]: {
                 name: "string",
                 email: "string",
-                massage: "string",
+                message: "string",
             }
         });
     };
@@ -44,7 +44,7 @@ const contactUs = async (req, res) => {
                 <div style="margin-bottom: 15px;">
                     <span style="font-weight: bold; color: #666;">Message:</span>
                     <p style="margin: 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px; background-color: #f9f9f9; color: #333;">
-                        ${massage}
+                        ${message}
                     </p>
                 </div>
             </div>
@@ -52,12 +52,12 @@ const contactUs = async (req, res) => {
         });
 
         return res.status(200).json({
-            massage: 'Information Sent Successfully'
+            message: 'Information Sent Successfully'
         });
 
     } catch (error) {
         return res.status(500).json({
-            massage: "Internal server error",
+            message: "Internal server error",
             error,
         });
     };

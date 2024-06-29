@@ -6,7 +6,7 @@ const userRegisterValidation = async (req, res, next) => {
 
     if (!fullName || !email || !password) {
         return res.status(400).json({
-            massage: 'Provide All Required Feilds',
+            message: 'Provide All Required Feilds',
             ["exp."]: {
                 fullName: "string",
                 email: "string",
@@ -17,7 +17,7 @@ const userRegisterValidation = async (req, res, next) => {
 
     if (typeof fullName !== 'string') {
         return res.status(400).json({
-            massage: 'Full name must be a string and at least 5 characters',
+            message: 'Full name must be a string and at least 5 characters',
         })
     }
 
@@ -25,19 +25,19 @@ const userRegisterValidation = async (req, res, next) => {
 
     if (registerdUsers) {
         return res.status(400).json({
-            massage: 'This email already registerd',
+            message: 'This email already registerd',
         })
     }
 
     if (typeof email !== 'string' || !EMAIL_PATTERN.test(email)) {
         return res.status(400).json({
-            massage: 'Invalid email address',
+            message: 'Invalid email address',
         })
     }
 
     if (typeof password !== 'string' || password.length < 8 || !PASSWORD_PATTERN.test(password)) {
         return res.status(400).json({
-            massage: 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character',
+            message: 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character',
         })
     }
 
@@ -49,7 +49,7 @@ const userLoginValidation = (req, res, next) => {
 
     if (!email || !password) {
         return res.status(400).json({
-            massage: 'Provide All Required Feilds',
+            message: 'Provide All Required Feilds',
             ["exp."]: {
                 email: "string",
                 password: "string"
@@ -59,13 +59,13 @@ const userLoginValidation = (req, res, next) => {
 
     if (typeof email !== 'string' || !EMAIL_PATTERN.test(email)) {
         return res.status(400).json({
-            massage: 'Invalid email address',
+            message: 'Invalid email address',
         })
     }
 
     if (typeof password !== 'string' || password.length < 8 || !PASSWORD_PATTERN.test(password)) {
         return res.status(400).json({
-            massage: 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character',
+            message: 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character',
         })
     }
 

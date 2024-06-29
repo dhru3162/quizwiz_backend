@@ -7,7 +7,7 @@ const validateRole = (req, res, next) => {
         next()
     } else {
         return res.status(403).json({
-            massage: "Permission denied you are not a admin"
+            message: "Permission denied you are not a admin"
         })
     }
 
