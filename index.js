@@ -48,7 +48,7 @@ const PORT = process.env.PORT || 8000;
 
 const allowedOrigins = [
   "http://localhost:3000", // Local development URL
-  "https://your-production.com", // Your production site
+  "https://quizwiz-by-dhru3162.vercel.app", // Production site
 ];
 const corsOptions = {
   origin: function (origin, callback) {
