@@ -46,8 +46,23 @@ require("./database/db");
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+const allowedOrigins = [
+  "http://localhost:3000", // Local development URL
+  "https://your-production.com", // Your production site
+];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
+
 app.use(express.static("public"));
-app.use(cors());
 app.use(express.json());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
