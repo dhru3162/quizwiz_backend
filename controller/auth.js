@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/user")
+const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const Credential = require("../models/credential");
 const Session = require("../models/session");
@@ -7,244 +7,259 @@ const { DateTime } = require("luxon");
 const nodemailer = require("nodemailer");
 
 module.exports = {
-    registerUser: async (req, res) => {
-        const { fullName, email, password } = req.body;
+  registerUser: async (req, res) => {
+    const { fullName, email, password } = req.body;
 
-        try {
-            // Create User In DataBase
-            const user = await User.create({
-                fullName,
-                email,
-                role: 'user'
-            });
+    try {
+      // Create User In DataBase
+      const user = await User.create({
+        fullName,
+        email,
+        role: "user",
+      });
 
-            // Encrypt Password And Store In DataBase
-            const encryptedPassword = await bcrypt.hash(password, 10);
-            await Credential.create({
-                userId: user._id,
-                password: encryptedPassword,
-            });
+      // Encrypt Password And Store In DataBase
+      const encryptedPassword = await bcrypt.hash(password, 10);
+      await Credential.create({
+        userId: user._id,
+        password: encryptedPassword,
+      });
 
-            // Generate Jwt Token And Store In DataBase
-            const tokenObj = {
-                _id: user._id,
-                fullName: user.fullName,
-                email: user.email,
-            };
-            const expireTime = 15 * 24 * 60 * 60;
-            const jwtToken = jwt.sign(
-                tokenObj,
-                process.env.JWT_SECRET_KEY,
-                { expiresIn: expireTime }
-            );
-            await Session.create({
-                userId: user._id,
-                token: jwtToken,
-                status: 'current',
-                loginAt: DateTime.utc(),
-                expireAt: DateTime.utc().plus({ hours: 3 })
-            });
+      // Generate Jwt Token And Store In DataBase
+      const tokenObj = {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+      };
+      const expireTime = 15 * 24 * 60 * 60;
+      const jwtToken = jwt.sign(tokenObj, process.env.JWT_SECRET_KEY, {
+        expiresIn: expireTime,
+      });
+      await Session.create({
+        userId: user._id,
+        token: jwtToken,
+        status: "current",
+        loginAt: DateTime.utc(),
+        expireAt: DateTime.utc().plus({ hours: 3 }),
+      });
 
-            return res.status(201).json({
-                user,
-                token: jwtToken
-            });
-        } catch (error) {
-            return res.status(500).json({
-                message: "Internal Server Error",
-                error: error,
-            });
-        };
-    },
+      res.cookie("x-session-token", jwtToken, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 15 * 24 * 60 * 60 * 1000,
+        path: "/",
+      });
 
-    loginUser: async (req, res) => {
-        const { email, password } = req.body
+      return res.status(201).json({
+        user,
+        token: jwtToken,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: "Internal Server Error",
+        error: error,
+      });
+    }
+  },
 
-        try {
-            // Find user is exist or not
-            const user = await User.findOne({ email: email }).lean()
-            if (!user) {
-                return res.status(404).json({
-                    message: 'User not found. Please try again with different email.'
-                });
-            };
+  loginUser: async (req, res) => {
+    const { email, password } = req.body;
 
-            // Get password and check is correct or not
-            const credential = await Credential.findOne({ userId: user._id })
-            const checkPassword = await bcrypt.compare(password, credential.password)
-            if (!checkPassword) {
-                return res.status(401).json({
-                    message: 'Invalid Password.'
-                });
-            };
-
-            // Generate Jwt Token And Update In Session DataBase
-            const tokenObj = {
-                _id: user._id,
-                fullName: user.fullName,
-                email: user.email,
-            };
-            const expireTime = 15 * 24 * 60 * 60;
-            const jwtToken = jwt.sign(tokenObj, process.env.JWT_SECRET_KEY, { expiresIn: expireTime })
-            await Session.findOneAndUpdate(
-                { userId: user._id, },
-                {
-                    userId: user._id,
-                    token: jwtToken,
-                    status: 'current',
-                    loginAt: DateTime.utc(),
-                    expireAt: DateTime.utc().plus({ hours: 3 }),
-                },
-            );
-
-            return res.status(200).json({
-                user,
-                token: jwtToken
-            });
-
-        } catch (error) {
-            return res.status(500).json({
-                message: "Internal Server Error",
-                error,
-            });
-        };
-    },
-
-    checkWhoIs: (req, res) => {
-        const { loggedInUserData } = req;
-        res.status(200).json({
-            user: loggedInUserData["user"],
-            session: loggedInUserData["session"]
+    try {
+      // Find user is exist or not
+      const user = await User.findOne({ email: email }).lean();
+      if (!user) {
+        return res.status(404).json({
+          message: "User not found. Please try again with different email.",
         });
-    },
+      }
 
-    logOutUser: async (req, res) => {
-        const { sessionId } = req.body;
+      // Get password and check is correct or not
+      const credential = await Credential.findOne({ userId: user._id });
+      const checkPassword = await bcrypt.compare(password, credential.password);
+      if (!checkPassword) {
+        return res.status(401).json({
+          message: "Invalid Password.",
+        });
+      }
 
-        if (!sessionId) {
-            return res.status(400).json({
-                message: 'sessionId Required'
-            });
-        };
+      // Generate Jwt Token And Update In Session DataBase
+      const tokenObj = {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+      };
+      const expireTime = 15 * 24 * 60 * 60;
+      const jwtToken = jwt.sign(tokenObj, process.env.JWT_SECRET_KEY, {
+        expiresIn: expireTime,
+      });
+      await Session.findOneAndUpdate(
+        { userId: user._id },
+        {
+          userId: user._id,
+          token: jwtToken,
+          status: "current",
+          loginAt: DateTime.utc(),
+          expireAt: DateTime.utc().plus({ hours: 3 }),
+        }
+      );
 
-        try {
-            const getSession = await Session.findById(sessionId);
+      res.cookie("x-session-token", jwtToken, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 15 * 24 * 60 * 60 * 1000,
+        path: "/",
+      });
 
-            if (!getSession) {
-                return res.status(404).json({
-                    message: 'sessionId not found'
-                });
-            };
+      return res.status(200).json({
+        user,
+        token: jwtToken,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: "Internal Server Error",
+        error,
+      });
+    }
+  },
 
-            if (getSession.status == 'expired') {
-                return res.status(200).json({
-                    message: 'Token Already Expired'
-                });
-            };
+  checkWhoIs: (req, res) => {
+    const { loggedInUserData } = req;
+    res.status(200).json({
+      user: loggedInUserData["user"],
+      session: loggedInUserData["session"],
+    });
+  },
 
-            await Session.findByIdAndUpdate(
-                sessionId,
-                { status: 'expired' },
-                { new: true }
-            )
+  logOutUser: async (req, res) => {
+    const { sessionId } = req.body;
 
-            return res.status(200).json({
-                message: "Logout Successful.",
-            });
+    if (!sessionId) {
+      return res.status(400).json({
+        message: "sessionId Required",
+      });
+    }
 
-        } catch (error) {
-            return res.status(500).json({
-                message: "Internal Server Error",
-                error
-            });
-        };
-    },
+    try {
+      const getSession = await Session.findById(sessionId);
 
-    changePassword: async (req, res) => {
-        const { currentPassword, newPassword } = req.body;
-        const { loggedInUserData: { user } } = req;
+      if (!getSession) {
+        return res.status(404).json({
+          message: "sessionId not found",
+        });
+      }
 
-        try {
-            const { password, _id } = await Credential.findOne({ userId: user._id });
-            const checkPassword = await bcrypt.compare(currentPassword, password);
-            if (!checkPassword) {
-                return res.status(400).json({
-                    message: 'Current password you entered is incorrect.'
-                });
-            };
+      if (getSession.status == "expired") {
+        return res.status(200).json({
+          message: "Token Already Expired",
+        });
+      }
 
-            const encryptedPassword = await bcrypt.hash(newPassword, 10);
-            const upadetPassword = await Credential.findByIdAndUpdate(
-                _id,
-                {
-                    password: encryptedPassword,
-                },
-                { new: true }
-            );
-            if (!upadetPassword) {
-                return res.status(404).json({
-                    message: 'User Not Found'
-                });
-            };
+      await Session.findByIdAndUpdate(
+        sessionId,
+        { status: "expired" },
+        { new: true }
+      );
 
-            return res.status(200).json({
-                message: "Password changed successful.",
-            });
+      return res.status(200).json({
+        message: "Logout Successful.",
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: "Internal Server Error",
+        error,
+      });
+    }
+  },
 
-        } catch (error) {
-            return res.status(500).json({
-                message: "Internal Server Error",
-                error
-            });
-        };
-    },
+  changePassword: async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    const {
+      loggedInUserData: { user },
+    } = req;
 
-    forgotPassword: async (req, res) => {
-        const { email } = req.body;
+    try {
+      const { password, _id } = await Credential.findOne({ userId: user._id });
+      const checkPassword = await bcrypt.compare(currentPassword, password);
+      if (!checkPassword) {
+        return res.status(400).json({
+          message: "Current password you entered is incorrect.",
+        });
+      }
 
-        try {
-            // Find user is exist or not
-            const user = await User.findOne({ email });
-            if (!user) {
-                return res.status(404).json({
-                    message: 'Email id not registered.'
-                });
-            };
+      const encryptedPassword = await bcrypt.hash(newPassword, 10);
+      const upadetPassword = await Credential.findByIdAndUpdate(
+        _id,
+        {
+          password: encryptedPassword,
+        },
+        { new: true }
+      );
+      if (!upadetPassword) {
+        return res.status(404).json({
+          message: "User Not Found",
+        });
+      }
 
-            const tokenObj = {
-                _id: user._id,
-                fullName: user.fullName,
-                email: user.email,
-            };
-            const expireTime = 1 * 60 * 60;
-            const jwtToken = jwt.sign(tokenObj, process.env.JWT_SECRET_KEY, { expiresIn: expireTime });
-            console.log('jwtToken: ', jwtToken);
+      return res.status(200).json({
+        message: "Password changed successful.",
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: "Internal Server Error",
+        error,
+      });
+    }
+  },
 
-            await Credential.findOneAndUpdate(
-                {
-                    userId: user._id,
-                },
-                {
-                    forgotPasswordKey: true,
-                }
-            );
+  forgotPassword: async (req, res) => {
+    const { email } = req.body;
 
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                host: "smtp.gmail.email",
-                port: 465,
-                secure: true,
-                auth: {
-                    user: process.env.GOOGLE_USERID,
-                    pass: process.env.GOOGLE_PASSWORD,
-                },
-            });
+    try {
+      // Find user is exist or not
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({
+          message: "Email id not registered.",
+        });
+      }
 
-            await transporter.sendMail({
-                from: '"QuizWiz Team" <quizwiz@gmail.com>',
-                to: user.email,
-                subject: "Reset your quizwiz account password",
-                html: `
+      const tokenObj = {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+      };
+      const expireTime = 1 * 60 * 60;
+      const jwtToken = jwt.sign(tokenObj, process.env.JWT_SECRET_KEY, {
+        expiresIn: expireTime,
+      });
+      console.log("jwtToken: ", jwtToken);
+
+      await Credential.findOneAndUpdate(
+        {
+          userId: user._id,
+        },
+        {
+          forgotPasswordKey: true,
+        }
+      );
+
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        host: "smtp.gmail.email",
+        port: 465,
+        secure: true,
+        auth: {
+          user: process.env.GOOGLE_USERID,
+          pass: process.env.GOOGLE_PASSWORD,
+        },
+      });
+
+      await transporter.sendMail({
+        from: '"QuizWiz Team" <quizwiz@gmail.com>',
+        to: user.email,
+        subject: "Reset your quizwiz account password",
+        html: `
                 <div style="font-family: Arial, sans-serif;">
                     <div class="email-container" style="max-width: 600px; border: 1px solid #2D3250; background-color: #EEEEEE; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
                         <div class="header" style="text-align: center;">
@@ -288,82 +303,86 @@ module.exports = {
                     </div>
                 </div>
                 `,
-            });
+      });
 
-            return res.status(200).json({
-                success: true,
-            });
-
-        } catch (error) {
-            return res.status(500).json({
-                message: "Internal Server Error",
-                error
-            });
-        }
-    },
-
-    checkLink: async (req, res) => {
-        const { token } = req.body;
-
-        if (!token || token === "") {
-            return res.status(400).json({
-                message: 'Bad Request'
-            })
-        }
-
-        try {
-            const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-            const password = await Credential.findOne({ userId: decodedToken._id }).lean();
-            if (!password?.forgotPasswordKey) {
-                return res.status(401).json({
-                    message: 'token expired'
-                });
-            };
-
-            return res.status(200).json({
-                success: true,
-            });
-
-        } catch (error) {
-            return res.status(401).json({
-                message: 'token expired'
-            });
-        };
-    },
-
-    ResetPassword: async (req, res) => {
-        const { token, newPassword } = req.body;
-
-        try {
-            const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
-
-            const encryptedPassword = await bcrypt.hash(newPassword, 10);
-            const credential = await Credential.findOne({ userId: decodedToken._id }).lean();
-            const checkPassword = await bcrypt.compare(newPassword, credential.password);
-            if (checkPassword) {
-                return res.status(401).json({
-                    message: 'Password must be different from the current one'
-                });
-            }
-            await Credential.findOneAndUpdate(
-                {
-                    userId: decodedToken._id,
-                },
-                {
-                    forgotPasswordKey: false,
-                    password: encryptedPassword,
-                }
-            );
-
-            return res.status(200).json({
-                message: "Password changed successful.",
-            });
-
-        } catch (error) {
-            return res.status(401).json({
-                message: 'token expired'
-            });
-        }
+      return res.status(200).json({
+        success: true,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: "Internal Server Error",
+        error,
+      });
     }
+  },
+
+  checkLink: async (req, res) => {
+    const { token } = req.body;
+
+    if (!token || token === "") {
+      return res.status(400).json({
+        message: "Bad Request",
+      });
+    }
+
+    try {
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+      const password = await Credential.findOne({
+        userId: decodedToken._id,
+      }).lean();
+      if (!password?.forgotPasswordKey) {
+        return res.status(401).json({
+          message: "token expired",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+      });
+    } catch (error) {
+      return res.status(401).json({
+        message: "token expired",
+      });
+    }
+  },
+
+  ResetPassword: async (req, res) => {
+    const { token, newPassword } = req.body;
+
+    try {
+      const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+
+      const encryptedPassword = await bcrypt.hash(newPassword, 10);
+      const credential = await Credential.findOne({
+        userId: decodedToken._id,
+      }).lean();
+      const checkPassword = await bcrypt.compare(
+        newPassword,
+        credential.password
+      );
+      if (checkPassword) {
+        return res.status(401).json({
+          message: "Password must be different from the current one",
+        });
+      }
+      await Credential.findOneAndUpdate(
+        {
+          userId: decodedToken._id,
+        },
+        {
+          forgotPasswordKey: false,
+          password: encryptedPassword,
+        }
+      );
+
+      return res.status(200).json({
+        message: "Password changed successful.",
+      });
+    } catch (error) {
+      return res.status(401).json({
+        message: "token expired",
+      });
+    }
+  },
 };
